@@ -1,4 +1,4 @@
-DigitalStack Digest 🚀
+DigitalStack Digest 🚀 README (Auto-generated)
 
 A modern, curated directory for digital tools, industry news, and creator success stories. Built as a lightweight, single-file React application using Tailwind CSS.
 
