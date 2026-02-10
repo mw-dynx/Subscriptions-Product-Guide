@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigitalStack Digest</title>
+    
+    <!-- 1. Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. Load React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- 3. Load Babel (to translate JSX) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- 4. Add Custom Font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+
+    <!-- THE ROOT ELEMENT -->
+    <div id="root"></div>
+
+    <!-- THE REACT APP SCRIPT -->
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        // --- MOCK DATA ---
+        const CATEGORIES = ["Project Management", "Design", "Development", "Marketing", "Finance"];
+
+        const APPS = [
+            { id: 1, name: "FusionFlow", category: "Project Management", description: "Streamlined task management and collaboration platform for remote teams.", tags: ["Productivity", "SaaS", "Teamwork"], link: "#" },
+            { id: 2, name: "VectorSculpt", category: "Design", description: "The ultimate vector editing tool with real-time collaborative features.", tags: ["Graphics", "Creative", "Cloud"], link: "#" },
+            { id: 3, name: "CodeForge", category: "Development", description: "AI-powered environment for rapid prototyping and deployment.", tags: ["AI", "DevOps", "Testing"], link: "#" },
+            { id: 4, name: "GrowthPulse", category: "Marketing", description: "Automated campaign tracking and performance analysis dashboard.", tags: ["Analytics", "CRM", "Automation"], link: "#" },
+            { id: 5, name: "LedgerZen", category: "Finance", description: "Simple, compliant bookkeeping for freelancers and small businesses.", tags: ["Finance", "Accounting", "Compliance"], link: "#" },
+        ];
+
+        const NEWS = [
+            { id: 101, title: "The Rise of Micro-SaaS", date: "2024-10-01", summary: "A look into how specialized software tools are capturing market share from giants.", tags: ["Industry Trends", "SaaS", "Market"], link: "#" },
+            { id: 102, title: "VectorSculpt Update", date: "2024-09-28", summary: "Designers rejoice as a long-awaited feature goes live, changing workflows.", tags: ["Design", "Update", "Creative"], link: "#" },
+            { id: 103, title: "Securing Your Stack", date: "2024-09-25", summary: "Expert tips on maintaining data security as remote work increases.", tags: ["Security", "Development", "Compliance"], link: "#" },
+        ];
+
+        const STORIES = [
+            { id: 201, creator: "Alex Chen", tool: "FusionFlow", title: "7 Figures in 12 Months", insight: "Alex shares the exact workflow and minimal toolset that powered his rapid growth.", tags: ["Success Story", "Productivity", "Workflow"], link: "#" },
+            { id: 202, creator: "Maria Diaz", tool: "VectorSculpt", title: "5 Clients via Open Source", insight: "A breakdown of creative strategy and leveraging community platforms.", tags: ["Freelance", "Creative", "Marketing"], link: "#" },
+            { id: 203, creator: "Samir Khan", tool: "CodeForge", title: "Decoupling Microservices", insight: "Advanced technical guide on improving scalability and reducing latency.", tags: ["Development", "Tech Deep Dive", "Cloud"], link: "#" },
+        ];
+
+        // --- COMPONENTS ---
+
+        const TagBadge = ({ tag }) => (
+            <span className="inline-block bg-indigo-700 text-indigo-100 text-xs font-medium px-3 py-1 rounded-full mr-2 mb-2 transition duration-200 hover:bg-indigo-600 cursor-default select-none">
+                {tag}
+            </span>
+        );
+
+        const AppCard = ({ app }) => (
+            <div className="bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700 hover:border-indigo-500 transition duration-300">
+                <div className="flex justify-between items-start">
+                    <h3 className="text-2xl font-bold text-indigo-400 mb-2">{app.name}</h3>
+                    <span className="text-sm font-semibold text-gray-300 bg-gray-700 px-3 py-1 rounded-full">{app.category}</span>
+                </div>
+                <p className="text-gray-400 mb-4 h-12 overflow-hidden">{app.description}</p>
+                <div className="flex flex-wrap mb-4">
+                    {app.tags.map(tag => <TagBadge key={tag} tag={tag} />)}
+                </div>
+                <a href={app.link} className="block text-center bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300">
+                    View Guide
+                </a>
+            </div>
+        );
+
+        const NewsCard = ({ news }) => (
+            <div className="bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700 hover:border-purple-500 transition duration-300">
+                <h3 className="text-xl font-bold text-purple-400 mb-2">{news.title}</h3>
+                <p className="text-sm text-gray-500 mb-3">{news.date}</p>
+                <p className="text-gray-400 mb-4 h-12 overflow-hidden">{news.summary}</p>
+                <div className="flex flex-wrap">
+                    {news.tags.map(tag => <TagBadge key={tag} tag={tag} />)}
+                </div>
+                <a href={news.link} className="mt-4 inline-block text-purple-400 hover:text-purple-300 font-medium">
+                    Read Article &rarr;
+                </a>
+            </div>
+        );
+
+        const StoryCard = ({ story }) => (
+            <div className="bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700 hover:border-pink-500 transition duration-300">
+                <div className="flex justify-between items-center mb-2">
+                    <h4 className="text-lg font-semibold text-gray-300">Creator: {story.creator}</h4>
+                    <span className="text-sm text-pink-400 font-bold bg-gray-700 px-3 py-1 rounded-full">
+                        Feat. {story.tool}
+                    </span>
+                </div>
+                <h3 className="text-xl font-bold text-pink-400 mb-3">{story.title}</h3>
+                <p className="text-gray-400 mb-4 h-12 overflow-hidden italic">"{story.insight}"</p>
+                <div className="flex flex-wrap">
+                    {story.tags.map(tag => <TagBadge key={tag} tag={tag} />)}
+                </div>
+                <a href={story.link} className="mt-4 inline-block text-pink-400 hover:text-pink-300 font-medium">
+                    View Full Story &rarr;
+                </a>
+            </div>
+        );
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('apps');
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const allContent = useMemo(() => [
+                ...APPS.map(item => ({ ...item, type: 'app', render: AppCard })),
+                ...NEWS.map(item => ({ ...item, type: 'news', render: NewsCard })),
+                ...STORIES.map(item => ({ ...item, type: 'story', render: StoryCard })),
+            ], []);
+
+            const filteredContent = useMemo(() => {
+                const lowerCaseSearch = searchTerm.toLowerCase();
+                const tabFiltered = allContent.filter(item => {
+                    if (activeTab === 'apps' && item.type === 'app') return true;
+                    if (activeTab === 'news' && item.type === 'news') return true;
+                    if (activeTab === 'stories' && item.type === 'story') return true;
+                    return false;
+                });
+
+                if (!searchTerm) return tabFiltered;
+
+                return tabFiltered.filter(item => {
+                    const searchableText = [
+                        item.name, item.title, item.description, item.summary, item.insight,
+                        item.tool, item.creator, item.category, ...item.tags
+                    ].join(' ').toLowerCase();
+
+                    return searchableText.includes(lowerCaseSearch);
+                });
+            }, [activeTab, searchTerm, allContent]);
+
+            const getButtonClass = (tab) =>
+                `px-4 py-2 font-semibold transition-colors duration-200 ease-in-out rounded-lg
+                ${activeTab === tab
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/50'
+                    : 'text-gray-300 hover:bg-gray-700'
+                }`;
+
+            const renderContent = (item) => {
+                const CardComponent = item.render;
+                if (item.type === 'app') return <CardComponent key={item.id} app={item} />;
+                if (item.type === 'news') return <CardComponent key={item.id} news={item} />;
+                if (item.type === 'story') return <CardComponent key={item.id} story={item} />;
+                return null;
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-900 font-sans text-gray-100 p-8">
+                    <header className="py-8 bg-gray-800 border-b border-indigo-900/50 shadow-xl mb-8 rounded-xl">
+                        <div className="container mx-auto px-4 md:px-8">
+                            <h1 className="text-4xl font-extrabold text-white">
+                                <span className="text-indigo-400">DigitalStack</span> Digest
+                            </h1>
+                            <p className="text-gray-400 mt-2 text-lg">
+                                Curated guides, news, and success stories.
+                            </p>
+                        </div>
+                    </header>
+
+                    <div className="container mx-auto px-4 md:px-8">
+                        <div className="mb-8 p-6 bg-gray-800 rounded-xl shadow-inner border border-gray-700">
+                            <input
+                                type="text"
+                                placeholder={`Search ${activeTab.toUpperCase()}...`}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full p-4 text-gray-200 bg-gray-700 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 placeholder-gray-400"
+                            />
+                        </div>
+
+                        <div className="flex flex-wrap gap-4 mb-10 border-b border-gray-700 pb-4">
+                            <button onClick={() => setActiveTab('apps')} className={getButtonClass('apps')}>App Listings</button>
+                            <button onClick={() => setActiveTab('news')} className={getButtonClass('news')}>Industry News</button>
+                            <button onClick={() => setActiveTab('stories')} className={getButtonClass('stories')}>Creator Stories</button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredContent.length > 0 ? (
+                                filteredContent.map(renderContent)
+                            ) : (
+                                <div className="lg:col-span-3 text-center py-16 bg-gray-800 rounded-xl">
+                                    <p className="text-2xl text-gray-400">No results found.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
